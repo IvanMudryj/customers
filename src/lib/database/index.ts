@@ -7,13 +7,13 @@ interface TIndex {
 }
 
 const connectSequelize = async () => {
-  sequelize.sync({ alter: true })
-    .then(() => {
-      console.log("Connection has been established successfully.");
-    })
-    .catch((error) => {
-      console.error("Unable to connect to the database: ", error);
-    });
+  sequelize.validate()
+  .then(() => {
+    console.log("Connection has been established successfully.");
+  })
+  .catch((error) => {
+    console.error("Unable to connect to the database: ", error);
+  });
 };
 
 const connectDB = async (database: string) => {

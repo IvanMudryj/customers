@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from "sequelize";
+import { Sequelize, DataTypes, Model, Optional } from "sequelize";
 import config from "../../../config";
 
 const sequelize = new Sequelize({
@@ -9,4 +9,4 @@ const sequelize = new Sequelize({
   dialect: config.sqlDb.dialect
 });
 
-export { sequelize, DataTypes };
+export { sequelize, DataTypes, Model, Optional };

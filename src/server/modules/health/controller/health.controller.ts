@@ -7,8 +7,7 @@ import logger from "../../../../utils/logger";
  * @param {object} res response object.
  */
 const health = (req: Request, res: Response) => {
-  logger.error("OkK");
-  res.status(200).json({ health: "OK" });
+  res.status(200).json({ health: "OK", path: req.url });
 };
 
 export default health;

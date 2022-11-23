@@ -17,9 +17,16 @@ interface TSqlDB {
   dialect: dialectDB
 }
 
+interface TMetamap {
+  username: TEnv
+  userpass: TEnv
+  baseurl: TEnv
+}
+
 interface TConfig {
   server: TServer
   sqlDb: TSqlDB
+  metamap: TMetamap
 }
 
 export { TConfig, TEnv };

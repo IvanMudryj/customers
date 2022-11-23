@@ -23,8 +23,12 @@ const config: TConfig = {
     name: process.env.DB_NAME as string,
     type: process.env.DB_TYPE,
     dialect: process.env.DB_DIALECT as dialectDB
+  },
+  metamap: {
+    username: process.env.METAMAP_USERNAME as string,
+    userpass: process.env.METAMAP_USERPASS as string,
+    baseurl: process.env.METAMAP_BASEURL as string,
   }
-
 };
 
 export = config;
