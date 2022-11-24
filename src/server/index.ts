@@ -4,7 +4,6 @@ import events from "./events";
 
 import config from "../config";
 import connectDB from "../lib/database";
-import loadModels from "../lib/database/loadModels";
 
 const {
   server: { port }
@@ -12,7 +11,7 @@ const {
 const server = http.createServer(app);
 
 const mainServer = async () => {
-  loadModels();
+  
   await connectDB("sequelize");
   app.listen(port, async () => {
     events.onListen(port!);

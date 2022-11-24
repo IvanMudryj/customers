@@ -7,6 +7,7 @@ interface TIndex {
 }
 
 const connectSequelize = async () => {
+  loadModels(sequelize);
   sequelize.validate()
   .then(() => {
     console.log("Connection has been established successfully.");
@@ -17,6 +18,7 @@ const connectSequelize = async () => {
 };
 
 const connectDB = async (database: string) => {
+  
   const connect: TIndex = {
     mongoose: mongooseDB,
     sequelize: connectSequelize

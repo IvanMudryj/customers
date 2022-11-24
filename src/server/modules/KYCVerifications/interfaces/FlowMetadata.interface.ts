@@ -14,7 +14,34 @@ export class V4UUID {
     };
 }
 
+export interface Metamap_InputResponse {
+  result?: boolean;
+  error?: {
+    type: string,
+    code: string
+  }
+}
+
 export interface Metamap_InitResponse {
   identity: string;
   expired: boolean;
+}
+
+export interface Metamap_DocumentInputField {
+  inputType: string,
+  group: number,
+  data: {
+    type: string,
+    country: string,
+    page: string,
+    filename: string
+  }
+}
+
+export interface Metamap_SelfieInputField {
+  inputType: string,
+  data: {
+    type: string,
+    filename: string
+  }
 }

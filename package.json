@@ -6,6 +6,7 @@
   "scripts": {
     "start": "npm run build && node ./build/server/index.js ",
     "dev": "nodemon ./src/server/index.ts",
+    "generateModels": "nodemon ./src/generateModels.ts",
     "build": "rm -rf ./build && tsc -p .",
     "test": "jest",
     "coverage": "jest --coverage",
@@ -16,19 +17,27 @@
   "author": "Adelys Belen",
   "license": "ISC",
   "dependencies": {
+    "@tsed/multipartfiles": "^5.65.9",
+    "@types/multer": "^1.4.7",
+    "@typescript-eslint/parser": "^5.44.0",
     "axios": "^1.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
     "express-http-context": "^1.2.4",
     "glob": "^8.0.3",
     "http-errors": "^2.0.0",
     "joi": "^17.6.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.7.0",
+    "multer": "^1.4.5-lts.1",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.25.3",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^6.25.8",
+    "sequelize-typescript": "^2.1.5",
+    "sequelize-typescript-generator": "^9.0.1",
     "uuid": "^9.0.0",
     "winston": "^3.8.2",
     "yamljs": "^0.3.0"
@@ -41,13 +50,14 @@
     "@types/joi": "^17.2.3",
     "@types/jsonwebtoken": "^8.5.9",
     "@types/mongoose": "^5.11.97",
-    "@types/node": "^18.8.5",
+    "@types/node": "^18.11.9",
     "@types/pg": "^8.6.5",
     "@types/sequelize": "^4.28.14",
     "@types/uuid": "^8.3.4",
+    "@types/validator": "^13.7.10",
     "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "eslint": "^8.0.1",
+    "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard-with-typescript": "^23.0.0",
     "eslint-plugin-import": "^2.25.2",
@@ -57,7 +67,10 @@
     "jest": "^29.1.2",
     "nodemon": "^2.0.20",
     "prettier": "^2.7.1",
-    "typescript": "*",
+    "typescript": "^4.9.3",
     "yarn": "^1.22.19"
-  }
+  },
+  "nodemonConfig": {
+    "ignore": ["**/_modelsAuto/**"]
+ }
 }
