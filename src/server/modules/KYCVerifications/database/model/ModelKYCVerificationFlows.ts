@@ -6,7 +6,7 @@ import { IKYCVerificationFlows } from "../../domain/interface";
 
 @Table({ tableName: "KYCVerificationFlows", schema: "public", timestamps: true })
 export class ModelKYCVerificationFlows extends Model<IKYCVerificationFlows, IKYCVerificationFlows> implements IKYCVerificationFlows {
-  @Column({ primaryKey: true, type: DataType.INTEGER })
+  @Column({ primaryKey: true, type: DataType.INTEGER, autoIncrementIdentity: true, autoIncrement: true })
   @Index({ name: "KYCVerificationFlows_pkey", using: "btree", unique: true })
     IdKYCVerificationFlow!: number;
 
@@ -18,13 +18,14 @@ export class ModelKYCVerificationFlows extends Model<IKYCVerificationFlows, IKYC
     IdKYCVerificationFlowStatus!: number;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })
-    SessionJWT?: string;
+    MetaData?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(25) })
     FlowID?: string;
 
-  @Column({ allowNull: true, type: DataType.STRING(255) })
-    ResourceUrl?: string;
+  @Index({ name: "ResourceID_unique", using: "btree", unique: true })
+  @Column({ allowNull: true, type: DataType.STRING(25) })
+    ResourceID?: string;
 
   @Column({ allowNull: true, type: DataType.JSON })
     ResourceBody?: object;
@@ -32,9 +33,9 @@ export class ModelKYCVerificationFlows extends Model<IKYCVerificationFlows, IKYC
   @BelongsTo(() => ModelKYCVerifications)
     KYCVerification?: ModelKYCVerifications;
 
-  @HasMany(() => ModelKYCVerificationFlowSteps, { sourceKey: "IdKYCVerificationFlow" })
+  @HasMany(() => ModelKYCVerificationFlowSteps)
     KYCVerificationFlowSteps?: ModelKYCVerificationFlowSteps[];
 
-  @HasMany(() => ModelKYCVerificationFlowStatus, { sourceKey: "IdKYCVerificationFlowStatus" })
+  @HasMany(() => ModelKYCVerificationFlowStatus)
     KYCVerificationFlowStatuses?: ModelKYCVerificationFlowStatus[];
 }

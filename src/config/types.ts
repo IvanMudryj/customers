@@ -20,8 +20,9 @@ interface TSqlDB {
 interface TMetamap {
   username: TEnv
   userpass: TEnv
-  baseurl: TEnv
+  base_url: TEnv
   secret: TEnv
+  verification_endpoint: TEnv
 }
 
 interface TConfig {

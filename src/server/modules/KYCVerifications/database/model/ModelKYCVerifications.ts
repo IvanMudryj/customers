@@ -33,6 +33,6 @@ export class ModelKYCVerifications extends Model<IKYCVerifications, IKYCVerifica
   @HasMany(() => ModelKYCVerificationsInputs)
     KYCVerificationsInputs?: ModelKYCVerificationsInputs[];
 
-  @HasMany(() => ModelKYCVerificationFlows, { sourceKey: "IdKYCVerification" })
+  @HasMany(() => ModelKYCVerificationFlows)
     KYCVerificationFlows?: ModelKYCVerificationFlows[];
 }

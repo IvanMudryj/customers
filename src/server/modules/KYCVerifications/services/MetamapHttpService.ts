@@ -1,4 +1,6 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import LocalStorageService from "../../../../utils/localStorage";
+import * as environment from "../../../../config";
 
 enum StatusCode {
   Unauthorized = 401,
@@ -8,42 +10,54 @@ enum StatusCode {
 }
 
 const headers: Readonly<Record<string, string | boolean>> = {
-  Accept: "application/json",
-  "Content-Type": "application/json; charset=utf-8",
-  "Access-Control-Allow-Credentials": true,
-  "X-Requested-With": "XMLHttpRequest",
-};
-
-// We can use the following function to inject the JWT token through an interceptor
-// We get the `accessToken` from the localStorage that we set when we authenticate
-const injectToken = (config: AxiosRequestConfig): AxiosRequestConfig => {
-  try {
-    const token = localStorage.getItem("accessToken");
-
-    if (token != null) 
-      config.headers = { Authorization: `Bearer ${token}` };
-    
-    return config;
-  } catch (error: any) {
-    throw new Error(error);
-  }
+    "Accept": "application/json",
+    "Content-Type": "application/json; charset=utf-8",
+    "Access-Control-Allow-Credentials": true,
+    "X-Requested-With": "XMLHttpRequest",
 };
 
 export class Http {
   private instance: AxiosInstance | null = null;
-
   private get http(): AxiosInstance {
     return this.instance != null ? this.instance : this.initHttp();
   }
 
+  isTokenExpired = (token:string|null) => (!token || Date.now() >= JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).exp * 1000);
+
+  private async injectToken(config: AxiosRequestConfig) : Promise<AxiosRequestConfig> {
+    try {
+
+        let token = LocalStorageService.getItem("accessToken");
+        if(!token || Date.now() >= JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).exp * 1000) {
+
+            const authResponse = await axios.post(`${environment.metamap.base_url}/oauth`, { 'grant_type' : 'client_credentials'}, {
+                auth: {
+                    username: environment.metamap.username,
+                    password: environment.metamap.userpass,
+                },
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            });
+
+            token = authResponse.data.access_token;
+            LocalStorageService.setItem("accessToken", token);
+        }
+
+        config.headers = { Authorization: `Bearer ${token}` };
+        return config;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  };
+
   initHttp() {
+
     const http = axios.create({
-      baseURL: "https://api.example.com",
+      baseURL: environment.metamap.base_url,
       headers,
       withCredentials: true,
     });
 
-    http.interceptors.request.use(injectToken, (error) => Promise.reject(error));
+    http.interceptors.request.use(this.injectToken, (error) => Promise.reject(error));
 
     http.interceptors.response.use(
       (response) => response,
@@ -112,3 +126,5 @@ export class Http {
     return Promise.reject(error);
   }
 }
+
+export const MetamapHttpWrapper = new Http();

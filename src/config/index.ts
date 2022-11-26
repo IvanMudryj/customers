@@ -27,8 +27,9 @@ const config: TConfig = {
   metamap: {
     username: process.env.METAMAP_USERNAME as string,
     userpass: process.env.METAMAP_USERPASS as string,
-    baseurl: process.env.METAMAP_BASEURL as string,
-    secret: process.env.METAMAP_SECRET as string
+    base_url: process.env.METAMAP_BASEURL as string,
+    secret: process.env.METAMAP_SECRET as string,
+    verification_endpoint: process.env.METAMAP_VERIFICATION_ENDPOINT as string
   }
 };
 

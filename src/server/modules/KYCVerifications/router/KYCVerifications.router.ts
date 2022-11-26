@@ -1,16 +1,13 @@
 import { Router } from "express";
-import multer from "multer";
-import { middlewareValidator } from "../../../middleware/validator.middleware";
+import { MemoryMulter } from "../../../../utils/multer";
 import * as KYCVerificationsController from "../controller/KYCVerifications.controller";
+import { middlewareValidator } from "../../../middleware/validator.middleware";
 import { schemaKYCVerificationsInit, schemaKYCVerificationsInput } from "./validator";
 
 const router: Router = Router();
 
 router.get("/flows", KYCVerificationsController.getAllFlows);
 router.post("/initFlow/", middlewareValidator(schemaKYCVerificationsInit), KYCVerificationsController.initFlow);
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-router.post("/sendInput/", upload.single('File'), middlewareValidator(schemaKYCVerificationsInput), KYCVerificationsController.sendInput);
+router.post("/sendInput/", MemoryMulter.single('File'), middlewareValidator(schemaKYCVerificationsInput), KYCVerificationsController.sendInput);
 
 export = router;

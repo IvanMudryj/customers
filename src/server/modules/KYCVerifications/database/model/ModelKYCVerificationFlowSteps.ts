@@ -4,18 +4,18 @@ import { ModelKYCVerificationFlows } from "./ModelKYCVerificationFlows";
 
 @Table({ tableName: "KYCVerificationFlowSteps", schema: "public", timestamps: true })
 export class ModelKYCVerificationFlowSteps extends Model<IKYCVerificationFlowSteps, IKYCVerificationFlowSteps> implements IKYCVerificationFlowSteps {
-  @Column({ primaryKey: true, type: DataType.INTEGER })
+  @Column({ primaryKey: true, type: DataType.INTEGER, autoIncrementIdentity: true, autoIncrement: true })
   @Index({ name: "KYCVerificationFlowSteps_pkey", using: "btree", unique: true })
     IdKYCVerificationFlowStep!: number;
 
   @ForeignKey(() => ModelKYCVerificationFlows)
   @Column({ allowNull: true, type: DataType.INTEGER })
-    IdKYCVerificationFlow?: number;
+    IdKYCVerificationFlow!: number;
 
-  @Column({ allowNull: true, type: DataType.STRING(255) })
+  @Column({ allowNull: true, type: DataType.STRING(25) })
     StepIdentifier?: string;
 
-  @Column({ allowNull: true, type: DataType.STRING(255) })
+  @Column({ allowNull: true, type: DataType.STRING(25) })
     EventCode?: string;
 
   @Column({ allowNull: true, type: DataType.JSON })

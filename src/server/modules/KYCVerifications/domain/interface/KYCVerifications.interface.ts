@@ -1,17 +1,22 @@
-import { IKYCVerificationsInputs } from "."
+import { EKYCVerificationStatus, IKYCVerificationInput, IKYCVerificationInputAttributes } from "."
 import { V4UUID } from "../../interfaces/FlowMetadata.interface"
 
-export interface KYCVerificationsAttributes {
-    IdKYCVerification: V4UUID
-    IdKYCVerificationStatus?: number
-    Identity?: string
-    Request?: object
-    Response?: object
-    ResponseStatus?: string
-    createdAt?: Date
-    updatedAt?: Date
-    deletedAt?: Date
+export interface KYCVerificationEntity extends KYCVerificationAttributes { 
+  IdKYCVerification: KYCVerificationPK
+}
 
-    //Collections
-    KYCVerificationsInputs?: IKYCVerificationsInputs[]
-  }
+export interface KYCVerificationPK extends V4UUID { }
+
+export interface KYCVerificationAttributes {
+  IdKYCVerificationStatus?: EKYCVerificationStatus
+  Identity?: string
+  Request?: object
+  Response?: object
+  ResponseStatus?: string
+  createdAt?: Date
+  updatedAt?: Date
+  deletedAt?: Date
+
+  //Collections
+  KYCVerificationsInputs?: IKYCVerificationInput[]
+}

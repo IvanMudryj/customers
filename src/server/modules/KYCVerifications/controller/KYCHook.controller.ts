@@ -5,13 +5,13 @@ import crypto from 'crypto';
 import * as KYCHookService from "../services/KYCHook.service";
 
 const middlewareVerifyHookSignature = (req: Request, res: Response, next: NextFunction) => {
+  const bodyPayload = req.body;
   try {
-    const hookPayload = req.body;
     const signature = req.headers['x-signature'] || "";
-    const isValidPayload = verifyHmacSignature(signature as string, config.metamap.secret, JSON.stringify(hookPayload)) 
+    const isValidPayload = verifyHmacSignature(signature as string, config.metamap.secret, JSON.stringify(bodyPayload)) 
     return next(!isValidPayload ? { name : 'invalid_hook_signature' } : null);
   } catch (e:any) {
-    logger.error('MATI_HOOK_SIGNATURE_ERROR', [e.message, JSON.stringify({ body : req.body , headers : req.headers, error : e} )] );
+    logger.error('MATI_HOOK_SIGNATURE_ERROR', [e.message, JSON.stringify({ body : bodyPayload , headers : req.headers, error : e} )] );
     next(e);
   }
 }
@@ -23,11 +23,16 @@ function verifyHmacSignature(signature:string, secret:string, payloadBody:string
 }
 
 const processKYCHook = (req: Request, res: Response, next: NextFunction) => {
+  const bodyPayload = req.body;
   try {
-    KYCHookService.processKYCHook();
-    return next();
+    if(!bodyPayload.resource) throw new Error("No resource attribute found within request");
+    if(!bodyPayload.eventName) throw new Error("No eventName attribute found within request");
+    if(bodyPayload.metadata && !bodyPayload.metadata.IdKYCVerification) throw new Error("No metadata.IdKYCVerification attribute found within request");
+    
+    KYCHookService.processKYCHook(bodyPayload);
+    return res.json({success: true});
   } catch (e:any) {
-    logger.error('MATI_HOOK_SIGNATURE_ERROR', [e.message, JSON.stringify({ body : req.body , headers : req.headers, error : e} )] );
+    logger.error('MATI_HOOK_PROCESS_ERROR', [e.message, JSON.stringify({ body : bodyPayload , headers : req.headers, error : e} )] );
     next(e);
   }
 }

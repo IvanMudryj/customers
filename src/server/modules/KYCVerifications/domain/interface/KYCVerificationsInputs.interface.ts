@@ -1,8 +1,13 @@
-import { V4UUID } from "../../interfaces/FlowMetadata.interface";
+import { IKYCVerificationPK } from ".";
 
-export interface KYCVerificationsInputsAttributes {
-  IdKYCVerificationInput?: number
-  IdKYCVerification?: V4UUID
+export interface KYCVerificationInputEntity extends KYCVerificationInputAttributes { 
+  IdKYCVerificationInput?: KYCVerificationInputPK
+}
+
+export interface KYCVerificationInputPK extends Number { }
+
+export interface KYCVerificationInputAttributes {
+  IdKYCVerification?: IKYCVerificationPK
   InputType?: string
   Value?: string
   MetaData?: object

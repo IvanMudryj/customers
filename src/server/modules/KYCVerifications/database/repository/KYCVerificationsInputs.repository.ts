@@ -1,22 +1,22 @@
-import { IKYCVerificationsInputs } from "../../domain/interface";
+import { IKYCVerificationInput, IKYCVerificationInputAttributes, IKYCVerificationInputPK } from "../../domain/interface";
 import { KYCVerificationsInputs } from "../model";
 
-export const findByPk = (query : IKYCVerificationsInputs) => { 
-    return KYCVerificationsInputs.findOne({ where : { IdKYCVerification: query.IdKYCVerification }})
-    .then((value:KYCVerificationsInputs | null) => value?.get({plain:true}) as IKYCVerificationsInputs);
+export const findByPk = (pk : IKYCVerificationInputPK) => { 
+    return KYCVerificationsInputs.findOne({ where : { IdKYCVerification: pk }})
+    .then((value:KYCVerificationsInputs | null) => value?.get({plain:true}) as IKYCVerificationInput);
 };
 
-export const findByIdKYCVerificationAndInputType = (query : IKYCVerificationsInputs) => {
-    return KYCVerificationsInputs.findOne({ where : { IdKYCVerification: query.IdKYCVerification, InputType: query.InputType }})
-    .then((value:KYCVerificationsInputs | null) => value?.get({plain:true}) as IKYCVerificationsInputs);
+export const findByIdKYCVerificationAndInputType = (item : IKYCVerificationInput) => {
+    return KYCVerificationsInputs.findOne({ where : { IdKYCVerification: item.IdKYCVerification, InputType: item.InputType }})
+    .then((value:KYCVerificationsInputs | null) => value?.get({plain:true}) as IKYCVerificationInput);
 };
 
-export const create = (item: IKYCVerificationsInputs, options?:any) => {
+export const create = (item: IKYCVerificationInputAttributes, options?:any) => {
     return KYCVerificationsInputs.create(item, options)
-    .then((value:void | KYCVerificationsInputs) => value?.get({plain:true}) as IKYCVerificationsInputs);
+    .then((value:void | KYCVerificationsInputs) => value?.get({plain:true}) as IKYCVerificationInput);
 };
 
-export const createOrUpdate = (item: IKYCVerificationsInputs, options?:any) => {
+export const createOrUpdate = (item: IKYCVerificationInput, options?:any) => {
     return KYCVerificationsInputs.upsert(item, options)
-    .then((value:[KYCVerificationsInputs, boolean | null]) => value[0]?.get({plain:true}) as IKYCVerificationsInputs);
+    .then((value:[KYCVerificationsInputs, boolean | null]) => value[0]?.get({plain:true}) as IKYCVerificationInput);
 };
