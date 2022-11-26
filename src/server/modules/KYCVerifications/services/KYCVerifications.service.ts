@@ -1,9 +1,11 @@
 
+import { AxiosResponse } from "axios";
 import logger from "../../../../utils/logger";
 import { metamapHttpWrapper } from "../../../../utils/metamapHttpWrapper";
-import { KYCFlowsRepository, KYCVerificationsInputsRepository, KYCVerificationsRepository} from "../database/repository"
-import { IKYCVerifications, IKYCVerificationsInputs } from "../domain/interface";
-import { FlowMetadata, Metamap_InitResponse, Metamap_InputResponse, V4UUID } from "../interfaces/FlowMetadata.interface";
+import { KYCFlowsRepository, KYCVerificationsRepository} from "../database/repository"
+import { IKYCVerifications } from "../domain/interface";
+import { FlowMetadata, Metamap_InitResponse, Metamap_InputFile, Metamap_InputResponse, V4UUID } from "../interfaces/FlowMetadata.interface";
+import FormData from 'form-data';
 
 const getAllFlows = () => KYCFlowsRepository.findAll();
 
@@ -20,32 +22,33 @@ const initFlow = async (FlowID:string, IdKYCVerification:V4UUID) : Promise<IKYCV
   }
 
   let oKYCVerifications:IKYCVerifications | null = await KYCVerificationsRepository.findByPk({ IdKYCVerification });
-  let oResponse:Metamap_InitResponse = await metamapHttpWrapper.post<FlowMetadata, Metamap_InitResponse>("/v2/verifications/", oMetaDataRequest);
+  let oResponse:AxiosResponse<Metamap_InitResponse> = await metamapHttpWrapper.post("/v2/verifications/", oMetaDataRequest);
 
-  if(!oKYCVerifications) 
+  if(!oKYCVerifications && oResponse.status == 200) 
     oKYCVerifications = await KYCVerificationsRepository.create({
       IdKYCVerification: IdKYCVerification,
-      ResponseStatus: oResponse.expired ? 'expired' : 'created',
+      ResponseStatus: oResponse.data.expired ? 'expired' : 'created',
       IdKYCVerificationStatus: 1,
       Request: oMetaDataRequest,
-      Response: oResponse,
-      Identity: oResponse.identity
+      Response: oResponse.data,
+      Identity: oResponse.data.identity
     });
 
-  logger.info(oKYCVerifications.IdKYCVerification);
-  return oKYCVerifications;
+  logger.info(oKYCVerifications?.IdKYCVerification);
+  return oKYCVerifications!;
 };
 
-const sendInput = async (IdKYCVerification:V4UUID, Type:string, Country:string, File:Uint8Array) : Promise<IKYCVerifications | null> => {
+const sendInput = async (IdKYCVerification:V4UUID, Type:string, Country:string, File:any, Filename: string) : Promise<IKYCVerifications | null> => {
 
   let oKYCVerifications:IKYCVerifications | null = await KYCVerificationsRepository.findByPk({ IdKYCVerification });
   if(!oKYCVerifications) throw new Error("IdKYCVerification not found");
+  if(oKYCVerifications.IdKYCVerificationStatus! > 2) throw new Error("IdKYCVerification already setup");
 
-  let inputFileData:any =  {
+  let inputFileData:Metamap_InputFile =  {
     "inputType": "selfie-photo",
     "data": {
       "type": "selfie-photo",
-      "filename": V4UUID.getRandom()
+      "filename": Filename
     }};
 
   if(Country && (Type == "ID-FRONT" || Type == "ID-BACK")) {
@@ -59,24 +62,22 @@ const sendInput = async (IdKYCVerification:V4UUID, Type:string, Country:string, 
 
   let body = new FormData();
   body.append("inputs", JSON.stringify([inputFileData]));
-  body.append("document", new Blob([File]), inputFileData.data.filename);
-
-  let oResponse:[Metamap_InputResponse] = await metamapHttpWrapper.post("/v2/identities/{{ID_VERIF_02}}/send-input", body, { headers: { "Content-Type": "application/x-www-form-urlencoded" }});
-
-  if(!oResponse.find(i=>i.result)) throw new Error("Invalid Input data MODIFICAR TEXTO");
-
-  let oKYCVerificationInput = await KYCVerificationsInputsRepository.findByIdKYCVerificationAndInputType({IdKYCVerification: IdKYCVerification, InputType: Type});
+  body.append("document", File, inputFileData.data.filename);
+  let oResponse:AxiosResponse<[Metamap_InputResponse]> = await metamapHttpWrapper.post(`/v2/identities/${oKYCVerifications.Identity}/send-input`, body, { headers: { "Content-Type": "application/x-www-form-urlencoded" }});
+  if(!oResponse.data.find(i => i.result)) throw new Error("Input Type Locked");
+  
+  let oKYCVerificationInput = oKYCVerifications.KYCVerificationsInputs!.find(i => i.InputType == Type);
   if(!oKYCVerificationInput) 
-  {
-    if(!oKYCVerifications?.KYCVerificationInputs?.length) oKYCVerifications.KYCVerificationInputs = [];
-    oKYCVerifications?.KYCVerificationInputs.push({
+    oKYCVerifications.KYCVerificationsInputs!.push({
       IdKYCVerification: IdKYCVerification,
       InputType: Type,
       Value: inputFileData.data.filename,
       MetaData: inputFileData
     });
-    KYCVerificationsRepository.addInputs(oKYCVerifications);
-  }
+  else 
+    oKYCVerificationInput.MetaData = inputFileData;
+  
+  oKYCVerifications = await KYCVerificationsRepository.addInputs(oKYCVerifications);
 
   return oKYCVerifications;
 };

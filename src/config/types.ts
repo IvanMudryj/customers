@@ -21,6 +21,7 @@ interface TMetamap {
   username: TEnv
   userpass: TEnv
   baseurl: TEnv
+  secret: TEnv
 }
 
 interface TConfig {

@@ -2,7 +2,7 @@ import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, BelongsTo
 import { IKYCVerificationFlowSteps } from "../../domain/interface";
 import { ModelKYCVerificationFlows } from "./ModelKYCVerificationFlows";
 
-@Table({ tableName: "KYCVerificationFlowSteps", schema: "public", timestamps: false })
+@Table({ tableName: "KYCVerificationFlowSteps", schema: "public", timestamps: true })
 export class ModelKYCVerificationFlowSteps extends Model<IKYCVerificationFlowSteps, IKYCVerificationFlowSteps> implements IKYCVerificationFlowSteps {
   @Column({ primaryKey: true, type: DataType.INTEGER })
   @Index({ name: "KYCVerificationFlowSteps_pkey", using: "btree", unique: true })
@@ -23,15 +23,6 @@ export class ModelKYCVerificationFlowSteps extends Model<IKYCVerificationFlowSte
 
   @Column({ allowNull: true, type: DataType.JSON })
     EventError?: object;
-
-  @Column({ allowNull: true, type: DataType.DATE })
-    createdAt?: Date;
-
-  @Column({ allowNull: true, type: DataType.DATE })
-    updatedAt?: Date;
-
-  @Column({ allowNull: true, type: DataType.DATE })
-    deletedAt?: Date;
 
   @BelongsTo(() => ModelKYCVerificationFlows)
     KYCVerificationFlow?: ModelKYCVerificationFlows;

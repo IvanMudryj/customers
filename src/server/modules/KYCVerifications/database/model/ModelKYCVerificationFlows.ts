@@ -4,7 +4,7 @@ import { ModelKYCVerificationFlowSteps } from "./ModelKYCVerificationFlowSteps";
 import { ModelKYCVerificationFlowStatus } from "./ModelKYCVerificationFlowStatus";
 import { IKYCVerificationFlows } from "../../domain/interface";
 
-@Table({ tableName: "KYCVerificationFlows", schema: "public", timestamps: false })
+@Table({ tableName: "KYCVerificationFlows", schema: "public", timestamps: true })
 export class ModelKYCVerificationFlows extends Model<IKYCVerificationFlows, IKYCVerificationFlows> implements IKYCVerificationFlows {
   @Column({ primaryKey: true, type: DataType.INTEGER })
   @Index({ name: "KYCVerificationFlows_pkey", using: "btree", unique: true })
@@ -28,15 +28,6 @@ export class ModelKYCVerificationFlows extends Model<IKYCVerificationFlows, IKYC
 
   @Column({ allowNull: true, type: DataType.JSON })
     ResourceBody?: object;
-
-  @Column({ allowNull: true, type: DataType.DATE })
-    createdAt?: Date;
-
-  @Column({ allowNull: true, type: DataType.DATE })
-    updatedAt?: Date;
-
-  @Column({ allowNull: true, type: DataType.DATE })
-    deletedAt?: Date;
 
   @BelongsTo(() => ModelKYCVerifications)
     KYCVerification?: ModelKYCVerifications;

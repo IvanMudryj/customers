@@ -39,9 +39,12 @@ const sendInput = async (req: Request, res: Response, next: NextFunction): Promi
 
   try{
     const { IdKYCVerification, Type, Country } = req.body;
-    const oFile = req.file?.buffer;
+    if(!req.file) throw new Error("No file received");
 
-    const response = await KYCVerificationsService.sendInput(IdKYCVerification, Type, Country, oFile as Uint8Array);
+    const oFile = req.file?.buffer;
+    const sFilename = req.file?.originalname;
+
+    const response = await KYCVerificationsService.sendInput(IdKYCVerification, Type, Country, oFile, sFilename);
     if (!response) throw new Error("Could not initiate verification");
     res.status(200).json({ 
       IdKYCVerification: response.IdKYCVerification,

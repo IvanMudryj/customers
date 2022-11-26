@@ -27,21 +27,13 @@ export interface Metamap_InitResponse {
   expired: boolean;
 }
 
-export interface Metamap_DocumentInputField {
+export interface Metamap_InputFile {
   inputType: string,
-  group: number,
+  group?: number,
   data: {
     type: string,
-    country: string,
-    page: string,
-    filename: string
-  }
-}
-
-export interface Metamap_SelfieInputField {
-  inputType: string,
-  data: {
-    type: string,
+    country?: string,
+    page?: string,
     filename: string
   }
 }

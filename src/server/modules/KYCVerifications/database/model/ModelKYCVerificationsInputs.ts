@@ -3,9 +3,9 @@ import { IKYCVerificationsInputs } from "../../domain/interface";
 import { V4UUID } from "../../interfaces/FlowMetadata.interface";
 import { ModelKYCVerifications } from "./ModelKYCVerifications";
 
-@Table({ tableName: "KYCVerificationsInputs", schema: "public", timestamps: false })
+@Table({ tableName: "KYCVerificationsInputs", schema: "public", timestamps: true })
 export class ModelKYCVerificationsInputs extends Model<IKYCVerificationsInputs, IKYCVerificationsInputs> implements IKYCVerificationsInputs {
-  @Column({ primaryKey: true, type: DataType.INTEGER })
+  @Column({ primaryKey: true, type: DataType.INTEGER, autoIncrementIdentity: true, autoIncrement: true })
   @Index({ name: "KYCVerificationsInputs_pkey", using: "btree", unique: true })
     IdKYCVerificationInput!: number;
 
@@ -21,15 +21,6 @@ export class ModelKYCVerificationsInputs extends Model<IKYCVerificationsInputs, 
 
   @Column({ allowNull: false, type: DataType.JSON })
     MetaData!: object;
-
-  @Column({ allowNull: false, type: DataType.DATE })
-    createdAt!: Date;
-
-  @Column({ allowNull: false, type: DataType.DATE })
-    updatedAt!: Date;
-
-  @Column({ allowNull: true, type: DataType.DATE })
-    deletedAt?: Date;
 
   @BelongsTo(() => ModelKYCVerifications)
     KYCVerification?: ModelKYCVerifications;

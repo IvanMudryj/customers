@@ -13,5 +13,5 @@ export interface KYCVerificationsAttributes {
     deletedAt?: Date
 
     //Collections
-    KYCVerificationInputs?: IKYCVerificationsInputs[]
+    KYCVerificationsInputs?: IKYCVerificationsInputs[]
   }

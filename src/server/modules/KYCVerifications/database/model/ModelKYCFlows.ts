@@ -13,7 +13,7 @@ export class ModelKYCFlows extends Model<IKYCFlows, IKYCFlows> implements IKYCFl
   @Column({ allowNull: true, type: DataType.DATE(6), defaultValue: Sequelize.literal("now()") })
     createdAt?: Date;
 
-  @Column({ allowNull: true, type: DataType.DATE(6) })
+  @Column({ allowNull: true, type: DataType.DATE(6), defaultValue: Sequelize.literal("now()") })
     updatedAt?: Date;
 
   @Column({ allowNull: true, type: DataType.DATE(6) })

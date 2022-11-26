@@ -28,6 +28,7 @@ const config: TConfig = {
     username: process.env.METAMAP_USERNAME as string,
     userpass: process.env.METAMAP_USERPASS as string,
     baseurl: process.env.METAMAP_BASEURL as string,
+    secret: process.env.METAMAP_SECRET as string
   }
 };
 

@@ -1,16 +1,17 @@
-import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, HasMany } from "sequelize-typescript";
+import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, HasMany, BelongsTo } from "sequelize-typescript";
 import { ModelKYCVerificationStatus } from "./ModelKYCVerificationStatus";
 import { ModelKYCVerificationsInputs } from "./ModelKYCVerificationsInputs";
 import { ModelKYCVerificationFlows } from "./ModelKYCVerificationFlows";
 import { V4UUID } from "../../interfaces/FlowMetadata.interface";
 import { IKYCVerifications } from "../../domain/interface";
 
-@Table({ tableName: "KYCVerifications", schema: "public", timestamps: false })
+@Table({ tableName: "KYCVerifications", schema: "public", timestamps: true })
 export class ModelKYCVerifications extends Model<IKYCVerifications, IKYCVerifications> implements IKYCVerifications {
   @Column({ primaryKey: true, type: DataType.UUID })
   @Index({ name: "KYCVerifications_pkey", using: "btree", unique: true })
     IdKYCVerification!: V4UUID;
 
+  @ForeignKey(() => ModelKYCVerificationStatus)
   @Column({ allowNull: true, type: DataType.INTEGER })
     IdKYCVerificationStatus?: number;
 
@@ -26,19 +27,10 @@ export class ModelKYCVerifications extends Model<IKYCVerifications, IKYCVerifica
   @Column({ allowNull: true, type: DataType.STRING(255) })
     ResponseStatus?: string;
 
-  @Column({ allowNull: true, type: DataType.DATE })
-    createdAt?: Date;
+  @BelongsTo(() => ModelKYCVerificationStatus)
+    KYCVerificationStatus?: ModelKYCVerificationStatus;
 
-  @Column({ allowNull: true, type: DataType.DATE })
-    updatedAt?: Date;
-
-  @Column({ allowNull: true, type: DataType.DATE })
-    deletedAt?: Date;
-
-  @HasMany(() => ModelKYCVerificationStatus, { sourceKey: "IdKYCVerificationStatus" })
-    KYCVerificationStatuses?: ModelKYCVerificationStatus[];
-
-  @HasMany(() => ModelKYCVerificationsInputs, { sourceKey: "IdKYCVerification" })
+  @HasMany(() => ModelKYCVerificationsInputs)
     KYCVerificationsInputs?: ModelKYCVerificationsInputs[];
 
   @HasMany(() => ModelKYCVerificationFlows, { sourceKey: "IdKYCVerification" })
