@@ -9,7 +9,15 @@ import FormData from 'form-data';
 
 const getAllFlows = () => KYCFlowsRepository.findAll();
 
-const initFlow = async (FlowID:string, IdKYCVerification:V4UUID) : Promise<IKYCVerification> => {
+const initFlow = async (FlowID:string, IdKYCVerification:V4UUID, CallbackInfo:any) : Promise<IKYCVerification> => {
+
+  const oCallbackConfig:any = {};
+  const oFlow = await KYCFlowsRepository.findByPk(FlowID);
+  if(!oFlow) throw new Error("Invalid FlowID");
+  else {
+    oCallbackConfig.events = CallbackInfo?.events ? CallbackInfo!.events : oFlow.EventsCallbackUrl;
+    oCallbackConfig.identity = CallbackInfo?.identity ? CallbackInfo!.identity : oFlow.IdentityInfoCallbackUrl;
+  }
 
   if(!IdKYCVerification) 
     IdKYCVerification = V4UUID.getRandom();
@@ -31,7 +39,8 @@ const initFlow = async (FlowID:string, IdKYCVerification:V4UUID) : Promise<IKYCV
       IdKYCVerificationStatus: EKYCVerificationStatus.INITIAL,
       Request: oMetaDataRequest,
       Response: oResponse.data,
-      Identity: oResponse.data.identity
+      Identity: oResponse.data.identity,
+      CallbackConfig: oCallbackConfig
     });
 
   logger.info(oKYCVerifications?.IdKYCVerification);

@@ -20,8 +20,8 @@ const getAllFlows = async (req: Request, res: Response, next: NextFunction): Pro
 const initFlow = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 
   try{
-    const { FlowID, IdKYCVerification } = req.body;
-    const response = await KYCVerificationsService.initFlow(FlowID, IdKYCVerification);
+    const { FlowID, IdKYCVerification, CallbackInfo } = req.body;
+    const response = await KYCVerificationsService.initFlow(FlowID, IdKYCVerification, CallbackInfo);
     if (!response) throw new Error("Could not initiate verification");
     res.status(200).json({ 
       IdKYCVerification: response.IdKYCVerification,

@@ -27,6 +27,12 @@ export class ModelKYCVerifications extends Model<IKYCVerification, IKYCVerificat
   @Column({ allowNull: true, type: DataType.STRING(255) })
     ResponseStatus?: string;
 
+  @Column({ allowNull: true, type: DataType.JSON })
+    VerificationData?: object;
+
+  @Column({ allowNull: true, type: DataType.JSON })
+    CallbackConfig?: object;
+
   @BelongsTo(() => ModelKYCVerificationStatus)
     KYCVerificationStatus?: ModelKYCVerificationStatus;
 

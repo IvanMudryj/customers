@@ -13,6 +13,8 @@ export interface KYCVerificationAttributes {
   Request?: object
   Response?: object
   ResponseStatus?: string
+  VerificationData?: object
+  CallbackConfig?: any
   createdAt?: Date
   updatedAt?: Date
   deletedAt?: Date

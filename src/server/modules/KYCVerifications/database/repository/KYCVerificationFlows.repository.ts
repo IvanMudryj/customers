@@ -16,7 +16,7 @@ export const findByPk = (pk : IKYCVerificationFlowPK) : Promise<IKYCVerification
 export const createOrUpdateByResourceID = (item: IKYCVerificationFlow, options?:any) => {
   return findByResourceID(item)
   .then((value:IKYCVerificationFlow) => {
-    item.IdKYCVerificationFlow = value.IdKYCVerificationFlow;
+    if(value) item.IdKYCVerificationFlow = value.IdKYCVerificationFlow;
     return createOrUpdate(item);
   });
 }

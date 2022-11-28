@@ -10,6 +10,12 @@ export class ModelKYCFlows extends Model<IKYCFlow, IKYCFlow> implements IKYCFlow
   @Column({ allowNull: true, type: DataType.STRING })
     Description?: string;
 
+  @Column({ allowNull: true, type: DataType.STRING })
+    EventsCallbackUrl?: string;
+
+  @Column({ allowNull: true, type: DataType.STRING })
+    IdentityInfoCallbackUrl?: string;
+
   @Column({ allowNull: true, type: DataType.DATE(6), defaultValue: Sequelize.literal("now()") })
     createdAt?: Date;
 

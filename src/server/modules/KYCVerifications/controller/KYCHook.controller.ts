@@ -27,7 +27,7 @@ const processKYCHook = (req: Request, res: Response, next: NextFunction) => {
   try {
     if(!bodyPayload.resource) throw new Error("No resource attribute found within request");
     if(!bodyPayload.eventName) throw new Error("No eventName attribute found within request");
-    if(bodyPayload.metadata && !bodyPayload.metadata.IdKYCVerification) throw new Error("No metadata.IdKYCVerification attribute found within request");
+    if(!bodyPayload.metadata?.IdKYCVerification) throw new Error("No metadata.IdKYCVerification attribute found within request");
     
     KYCHookService.processKYCHook(bodyPayload);
     return res.json({success: true});

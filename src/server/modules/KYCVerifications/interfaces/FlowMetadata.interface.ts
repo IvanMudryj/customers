@@ -88,6 +88,9 @@ export interface SEP09Fields {
   photo_proof_residence?: ReferenceBinaryField
   sex?: string
   proof_of_income?: ReferenceBinaryField
+
+  //Custom Fields
+  photo_selfie?: ReferenceBinaryField
 }
 
 export interface ReferenceBinaryField extends String { }
