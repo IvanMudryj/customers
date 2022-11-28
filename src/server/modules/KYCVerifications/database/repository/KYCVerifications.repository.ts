@@ -20,8 +20,8 @@ export const createIfNotExists = (item: IKYCVerification, options?:any) : Promis
   });
 };
 
-export const updateStatus = (IdKYCVerification:IKYCVerificationPK, KYCVerificationStatus:EKYCVerificationStatus, options?:any) : Promise<any>=> {
-  return update({ IdKYCVerificationStatus: KYCVerificationStatus }, { where : { IdKYCVerification: IdKYCVerification }, ...options});
+export const updateStatus = (IdKYCVerificationPK:IKYCVerificationPK, KYCVerificationStatus:EKYCVerificationStatus, options?:any) : Promise<any>=> {
+  return update(IdKYCVerificationPK, { IdKYCVerificationStatus: KYCVerificationStatus, ...options});
 };
 
 export const update = (IdKYCVerification:IKYCVerificationPK, item:IKYCVerificationAttributes, options?:any) : Promise<any>=> {
@@ -31,10 +31,9 @@ export const update = (IdKYCVerification:IKYCVerificationPK, item:IKYCVerificati
 export const addInputs = async (item: IKYCVerification) => {
   const t = await sequelize.transaction();
   try {
-
+    
     for await(const input of item.KYCVerificationsInputs!)
       await KYCVerificationsInputsRepository.createOrUpdate(input, { transaction: t });
-    await updateStatus(item.IdKYCVerification, item.KYCVerificationsInputs?.length == 3 ? EKYCVerificationStatus.READY : EKYCVerificationStatus.INCOMPLETE, { transaction: t })
     
     t.commit();
     return findByPk(item);

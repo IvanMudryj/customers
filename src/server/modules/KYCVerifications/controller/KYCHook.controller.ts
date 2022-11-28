@@ -9,9 +9,9 @@ const middlewareVerifyHookSignature = (req: Request, res: Response, next: NextFu
   try {
     const signature = req.headers['x-signature'] || "";
     const isValidPayload = verifyHmacSignature(signature as string, config.metamap.secret, JSON.stringify(bodyPayload)) 
-    return next(!isValidPayload ? { name : 'invalid_hook_signature' } : null);
+    return next(!isValidPayload ? { message : 'invalid_hook_signature' } : null);
   } catch (e:any) {
-    logger.error('MATI_HOOK_SIGNATURE_ERROR', [e.message, JSON.stringify({ body : bodyPayload , headers : req.headers, error : e} )] );
+    logger.error('MATI_HOOK_SIGNATURE_ERROR', { message: e.message, detail: JSON.stringify({ body : bodyPayload , headers : req.headers, error : e})});
     next(e);
   }
 }
@@ -32,7 +32,7 @@ const processKYCHook = (req: Request, res: Response, next: NextFunction) => {
     KYCHookService.processKYCHook(bodyPayload);
     return res.json({success: true});
   } catch (e:any) {
-    logger.error('MATI_HOOK_PROCESS_ERROR', [e.message, JSON.stringify({ body : bodyPayload , headers : req.headers, error : e} )] );
+    logger.error('MATI_HOOK_PROCESS_ERROR', { message: e.message, detail: JSON.stringify({ body : bodyPayload , headers : req.headers, error : e})});
     next(e);
   }
 }

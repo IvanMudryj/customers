@@ -9,11 +9,12 @@ export interface KYCVerificationFlowPK extends Number { }
 
 export interface KYCVerificationFlowAttributes {
   IdKYCVerification?: KYCVerificationPK
-  IdKYCVerificationFlowStatus: EKYCVerificationFlowStatus
+  IdKYCVerificationFlowStatus?: EKYCVerificationFlowStatus
   MetaData?: string
   FlowID?: string
   ResourceID?: string
   ResourceBody?: object
+  IdentityData?: object
   createdAt?: Date
   updatedAt?: Date
   deletedAt?: Date

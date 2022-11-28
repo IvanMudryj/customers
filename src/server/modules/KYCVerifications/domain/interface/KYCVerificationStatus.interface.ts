@@ -5,10 +5,8 @@ export interface KYCVerificationStatusEntity {
 
 export enum KYCVerificationStatusEnum {
   INITIAL = 1,
-  INCOMPLETE = 2,
-  READY = 3,
-  PROCESSING = 10,
-  VALIDATING = 15,
+  READY = 5,
+  PROCESSING = 10,  
   VALIDATION_SUCCEED = 20,
   MANUAL_VALIDATION = 21,
   VALIDATION_REJECTED = 99,

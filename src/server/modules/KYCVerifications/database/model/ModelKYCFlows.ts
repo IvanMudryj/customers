@@ -1,8 +1,8 @@
 import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey } from "sequelize-typescript";
-import { IKYCFlows } from "../../domain/interface";
+import { IKYCFlow } from "../../domain/interface";
 
 @Table({ tableName: "KYCFlows", schema: "public", timestamps: false })
-export class ModelKYCFlows extends Model<IKYCFlows, IKYCFlows> implements IKYCFlows {
+export class ModelKYCFlows extends Model<IKYCFlow, IKYCFlow> implements IKYCFlow {
   @Column({ primaryKey: true, type: DataType.STRING })
   @Index({ name: "KYCFlows_pkey", using: "btree", unique: true })
     FlowID!: string;

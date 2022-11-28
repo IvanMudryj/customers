@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import config from "../../../../config";
 import logger from "../../../../utils/logger";
+import CUIT from "../../../../utils/cuit";
 import { MetamapHttpWrapper } from "./MetamapHttpService";
 import { KYCVerificationFlowsRepository, KYCVerificationsRepository } from "../database/repository";
 import { EKYCVerificationFlowStatus, EKYCVerificationStatus, IKYCVerificationFlow, IKYCVerificationFlowStep } from "../domain/interface";
@@ -13,7 +14,7 @@ const processKYCHook = async (bodyPayload:any) : Promise<void> => {
     const hookData:Metamap_HookResponse = bodyPayload;
     const ResourceID = hookData.resource.split('/')[hookData.resource.split('/').length - 1];
 
-    const IdKYCVerification:V4UUID | undefined = hookData.metadata;
+    const IdKYCVerification:V4UUID | undefined = hookData.metadata?.IdKYCVerification;
     if(IdKYCVerification)
       await KYCVerificationsRepository.createIfNotExists({
         IdKYCVerification: IdKYCVerification,
@@ -21,10 +22,10 @@ const processKYCHook = async (bodyPayload:any) : Promise<void> => {
         IdKYCVerificationStatus: EKYCVerificationStatus.READY,
         Request: {flowId: hookData.flowId,"metadata": hookData.metadata },
         Response: bodyPayload
-      });      
+      });
 
     const StepData = bodyPayload;
-    let StepCode, StepError, IdKYCVerificationFlowStatus:EKYCVerificationFlowStatus;
+    let StepError, StepCode=hookData.eventName, IdKYCVerificationFlowStatus:EKYCVerificationFlowStatus;
     if(hookData.step) {
       StepCode = hookData.step.id;
       StepError = hookData.step.error;
@@ -35,11 +36,11 @@ const processKYCHook = async (bodyPayload:any) : Promise<void> => {
           IdKYCVerificationFlowStatus = EKYCVerificationFlowStatus.STARTED;
         break;
       case 'verification_inputs_completed':  
+          KYCVerificationsRepository.updateStatus(IdKYCVerification!, EKYCVerificationStatus.READY);
           IdKYCVerificationFlowStatus = EKYCVerificationFlowStatus.INPUTS_COMPLETED;
-          KYCVerificationsRepository.updateStatus(IdKYCVerification!, EKYCVerificationStatus.VALIDATING);
         break;
       case 'step_completed':
-        KYCVerificationsRepository.updateStatus(IdKYCVerification!, EKYCVerificationStatus.VALIDATING); //No se si cambiar aca... quizas lo sacamos
+        //KYCVerificationsRepository.updateStatus(IdKYCVerification!, EKYCVerificationStatus.VALIDATING); //No se si cambiar aca... quizas lo sacamos
         IdKYCVerificationFlowStatus = EKYCVerificationFlowStatus.PROCESSING_STEPS;
         break;
       case 'verification_expired':  
@@ -71,7 +72,7 @@ const processKYCHook = async (bodyPayload:any) : Promise<void> => {
       FlowID: hookData.flowId,
       IdKYCVerificationFlowStatus: IdKYCVerificationFlowStatus
     }
-    oKYCVerificationFlow = await KYCVerificationFlowsRepository.createOrUpdate(oKYCVerificationFlow);
+    oKYCVerificationFlow = await KYCVerificationFlowsRepository.createOrUpdateByResourceID(oKYCVerificationFlow);
 
     //FLOW_STEP
     let oKYCVerificationFlowStep:IKYCVerificationFlowStep = { 
@@ -88,7 +89,7 @@ const processKYCHook = async (bodyPayload:any) : Promise<void> => {
 
     return;
   } catch (e:any) {
-    logger.error('MATI_HOOK_ERROR', [ e.message, JSON.stringify({ bodyPayload })]);
+    logger.error('MATI_HOOK_ERROR', { message: e.message, detail: JSON.stringify({ bodyPayload })});
     return;
   }
 }
@@ -116,11 +117,11 @@ const processkycSteps = (oKYCVerificationFlow: IKYCVerificationFlow, ResourceID:
     return KYCVerificationsRepository.updateStatus(oKYCVerificationFlow.IdKYCVerification!, IdKYCVerificationStatus)
     .then(async () =>{
       return MapVerificationFields(oKYCVerificationFlow, ResourceID);
-    })
+    });
 
     
   } catch (e:any) {
-    logger.error('MATI_PROCESS_ERROR', [ e.message, JSON.stringify({ IdKYCVerificationFlow : oKYCVerificationFlow.IdKYCVerification, ResourceID, IdentityStatus })]);
+    logger.error('MATI_PROCESS_ERROR', { message: e.message, detail: JSON.stringify({ IdKYCVerificationFlow : oKYCVerificationFlow.IdKYCVerification, ResourceID, IdentityStatus })});
     return;
   }
 }
@@ -129,7 +130,8 @@ const MapVerificationFields = async (oKYCVerificationFlow: IKYCVerificationFlow,
   try {
 
     const oVerificationResponse:AxiosResponse<any> = await MetamapHttpWrapper.get(`${config.metamap.verification_endpoint}${ResourceID}`);
-    await KYCVerificationsRepository.update(oKYCVerificationFlow.IdKYCVerification!, { Response: oVerificationResponse });
+    await KYCVerificationFlowsRepository.update(oKYCVerificationFlow.IdKYCVerificationFlow!, { ResourceBody: oVerificationResponse.data });
+
     let oDocument = oVerificationResponse.data.documents[0];
     let oSEP12Body:SEP09Fields = {};
     if(oDocument.country) {
@@ -151,7 +153,7 @@ const MapVerificationFields = async (oKYCVerificationFlow: IKYCVerificationFlow,
               }
               else {
                 try {
-                  oSEP12Body.id_number = calculateCuilCuit(oDocument.fields.documentNumber.value.replace(/([^a-z0-9]+)/gi, ''),  oDocument.fields.sex.value);
+                  oSEP12Body.id_number = CUIT.calculateCuilCuit(oDocument.fields.documentNumber.value.replace(/([^a-z0-9]+)/gi, ''),  oDocument.fields.sex.value);
                   oSEP12Body.id_type = 'CUIT';
                 }
                 catch(e)
@@ -203,8 +205,10 @@ const MapVerificationFields = async (oKYCVerificationFlow: IKYCVerificationFlow,
         oSEP12Body.address =  oDocument.fields.address.value;
     }
 
+    await KYCVerificationFlowsRepository.update(oKYCVerificationFlow.IdKYCVerificationFlow!, { IdentityData: oSEP12Body });
+
   } catch (e:any) {
-    logger.error('MATI_MAPPING_ERROR', [ e.message, JSON.stringify({ IdKYCVerificationFlow : oKYCVerificationFlow.IdKYCVerification, ResourceID })]);
+    logger.error('MATI_MAPPING_ERROR', { message: e.message, detail: JSON.stringify({ IdKYCVerificationFlow : oKYCVerificationFlow.IdKYCVerification, ResourceID })});
     return;
   }
 }

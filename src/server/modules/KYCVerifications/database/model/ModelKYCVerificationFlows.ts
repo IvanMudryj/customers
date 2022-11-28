@@ -2,10 +2,10 @@ import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, BelongsTo
 import { ModelKYCVerifications } from "./ModelKYCVerifications";
 import { ModelKYCVerificationFlowSteps } from "./ModelKYCVerificationFlowSteps";
 import { ModelKYCVerificationFlowStatus } from "./ModelKYCVerificationFlowStatus";
-import { IKYCVerificationFlows } from "../../domain/interface";
+import { IKYCVerificationFlow } from "../../domain/interface";
 
 @Table({ tableName: "KYCVerificationFlows", schema: "public", timestamps: true })
-export class ModelKYCVerificationFlows extends Model<IKYCVerificationFlows, IKYCVerificationFlows> implements IKYCVerificationFlows {
+export class ModelKYCVerificationFlows extends Model<IKYCVerificationFlow, IKYCVerificationFlow> implements IKYCVerificationFlow {
   @Column({ primaryKey: true, type: DataType.INTEGER, autoIncrementIdentity: true, autoIncrement: true })
   @Index({ name: "KYCVerificationFlows_pkey", using: "btree", unique: true })
     IdKYCVerificationFlow!: number;
@@ -29,6 +29,9 @@ export class ModelKYCVerificationFlows extends Model<IKYCVerificationFlows, IKYC
 
   @Column({ allowNull: true, type: DataType.JSON })
     ResourceBody?: object;
+
+  @Column({ allowNull: true, type: DataType.JSON })
+    IdentityData?: object;
 
   @BelongsTo(() => ModelKYCVerifications)
     KYCVerification?: ModelKYCVerifications;

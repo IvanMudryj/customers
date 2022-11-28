@@ -1,10 +1,10 @@
 import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, BelongsTo } from "sequelize-typescript";
-import { IKYCVerificationsInputs } from "../../domain/interface";
+import { IKYCVerificationInput } from "../../domain/interface";
 import { V4UUID } from "../../interfaces/FlowMetadata.interface";
 import { ModelKYCVerifications } from "./ModelKYCVerifications";
 
 @Table({ tableName: "KYCVerificationsInputs", schema: "public", timestamps: true })
-export class ModelKYCVerificationsInputs extends Model<IKYCVerificationsInputs, IKYCVerificationsInputs> implements IKYCVerificationsInputs {
+export class ModelKYCVerificationsInputs extends Model<IKYCVerificationInput, IKYCVerificationInput> implements IKYCVerificationInput {
   @Column({ primaryKey: true, type: DataType.INTEGER, autoIncrementIdentity: true, autoIncrement: true })
   @Index({ name: "KYCVerificationsInputs_pkey", using: "btree", unique: true })
     IdKYCVerificationInput!: number;

@@ -1,17 +1,25 @@
 import { KYCVerificationFlowStepsRepository } from ".";
 import { sequelize } from "../../../../../lib/database/sequelize";
-import { IKYCVerificationFlow, IKYCVerificationFlowStep, IKYCVerificationFlowAttributes, IKYCVerificationFlowPK } from "../../domain/interface";
+import { IKYCVerificationFlow, IKYCVerificationFlowStep, IKYCVerificationFlowAttributes, IKYCVerificationFlowPK, EKYCVerificationFlowStatus } from "../../domain/interface";
 import { KYCVerificationFlows, KYCVerificationFlowSteps } from "../model";
 
 export const findByResourceID = (query : IKYCVerificationFlowAttributes) : Promise<IKYCVerificationFlow> => { 
   return KYCVerificationFlows.findOne({ where : { ResourceID: query.ResourceID }, include: [KYCVerificationFlowSteps]})
-  .then((val:KYCVerificationFlows | null) => val?.get({plain:true}) as IKYCVerificationFlow);
+  .then((value:KYCVerificationFlows | null) => value?.get({plain:true}) as IKYCVerificationFlow);
 };
 
 export const findByPk = (pk : IKYCVerificationFlowPK) : Promise<IKYCVerificationFlow> => { 
   return KYCVerificationFlows.findOne({ where : { IdKYCVerificationFlow: pk }, include: [KYCVerificationFlowSteps]})
-  .then((val:KYCVerificationFlows | null) => val?.get({plain:true}) as IKYCVerificationFlow);
+  .then((value:KYCVerificationFlows | null) => value?.get({plain:true}) as IKYCVerificationFlow);
 };
+
+export const createOrUpdateByResourceID = (item: IKYCVerificationFlow, options?:any) => {
+  return findByResourceID(item)
+  .then((value:IKYCVerificationFlow) => {
+    item.IdKYCVerificationFlow = value.IdKYCVerificationFlow;
+    return createOrUpdate(item);
+  });
+}
 
 export const createOrUpdate = (item: IKYCVerificationFlow, options?:any) => {
   return KYCVerificationFlows.upsert(item, options)
@@ -22,6 +30,14 @@ export const createStep = async (item: IKYCVerificationFlow, step: IKYCVerificat
   step.IdKYCVerificationFlow = item.IdKYCVerificationFlow!;
   return KYCVerificationFlowStepsRepository.createOrUpdate(step);
 }
+
+export const updateStatus = (IdKYCVerificationFlowPK:IKYCVerificationFlowPK, KYCVerificationFlowStatus:EKYCVerificationFlowStatus, options?:any) : Promise<any>=> {
+  return update(IdKYCVerificationFlowPK, { IdKYCVerificationFlowStatus: KYCVerificationFlowStatus, ...options});
+};
+
+export const update = (IdKYCVerificationFlowPK:IKYCVerificationFlowPK, item:IKYCVerificationFlowAttributes, options?:any) : Promise<any>=> {
+  return KYCVerificationFlows.update(item, { where : { IdKYCVerificationFlow: IdKYCVerificationFlowPK }, ...options});
+};
 
 export const addSteps = async (item: IKYCVerificationFlow) => {
   const t = await sequelize.transaction();

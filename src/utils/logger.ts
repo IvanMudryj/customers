@@ -22,7 +22,6 @@ const logger = createLogger({
   ),
   transports: [
     new transports.Console()
-
   ]
 });
 

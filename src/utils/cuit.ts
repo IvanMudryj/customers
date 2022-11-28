@@ -120,7 +120,7 @@ const isValid = (documentNumber:string, documentType:string, countryCode:string)
     return cuil_cuit;
   }
   
-  module.exports = {
+  export default {
     _isLengthOk: _isLengthOk,
     _checksumIsOk: _checksumIsOk,
     _isTypeOk: _isTypeOk,
